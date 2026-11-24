@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>車禍賠償試算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, trustworthy work tool for an insurance agent sitting beside a client
+   IDEA: a settlement worksheet — gold ledger header, ruled rows, one bold bottom line
+   PICTURE: the live 「預估可請求」 figure, always visible in a gold bar at the bottom
+   COLOUR and TYPE: 保險小管家 logo gold #C8921A on white, warm charcoal ink; Noto Sans TC
+   LAYOUT: one column, max 720px; header, tabs, card sections, sticky result bar */
+:root{color-scheme:light dark;
+--bg:light-dark(#ffffff,#14120e);--ink:light-dark(#1f1b14,#f3ede0);--muted:light-dark(#6e6553,#b4aa94);
+--line:light-dark(#ece3cf,#3a3329);--soft:light-dark(#faf5e9,#211d16);--card:light-dark(#ffffff,#1b1813);
+--gold:#c8921a;--gold2:#e5b443;--goldink:#2a1e04;--chip:light-dark(#fff,#1b1813);--danger:#b4442f}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 "Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;overflow-x:clip;padding-bottom:110px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold2);outline-offset:2px}
+header{background:linear-gradient(135deg,#d9a52a,#c8921a 55%,#a8760f);color:var(--goldink)}
+.hd{max-width:720px;margin:0 auto;padding:14px 16px;display:flex;align-items:center;gap:12px}
+.hd svg{flex:none;width:40px;height:40px}
+.hd h1{margin:0;font-size:22px;font-weight:900;line-height:1.1;flex:1}
+.hd small{display:block;font-size:12px;font-weight:500;opacity:.8;margin-top:3px}
+.hbtn{background:rgba(255,255,255,.92);color:var(--goldink);border:0;border-radius:10px;padding:0 14px;min-height:44px;font-weight:700;font-size:15px}
+main{max-width:720px;margin:0 auto;padding:16px}
+.tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin-bottom:16px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5}
+.tabs button{min-height:44px;border:1.5px solid var(--line);background:var(--chip);border-radius:12px;font-size:14px;font-weight:700;padding:4px 2px}
+.tabs button[aria-selected=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 16px;margin-bottom:14px}
+h2{font-size:20px;margin:0 0 6px;line-height:1.3}
+h3{font-size:17px;margin:0;display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+h3 b{font-size:17px;white-space:nowrap;color:var(--gold)}
+.hint{color:var(--muted);font-size:14px;margin:0 0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;border:1.5px solid var(--line);background:var(--chip);border-radius:999px;padding:6px 16px;font-size:15px;font-weight:500}
+.chip[aria-pressed=true]{background:var(--gold);border-color:var(--gold);color:var(--goldink);font-weight:700}
+.grp{font-size:13px;color:var(--muted);margin:14px 0 8px;font-weight:700}
+.grp:first-of-type{margin-top:0}
+label.f{display:block;margin-top:12px;font-size:14px;color:var(--muted);font-weight:500}
+label.f input,label.f select,label.f textarea{display:block;width:100%;margin-top:5px;min-height:46px;border:1.5px solid var(--line);background:var(--soft);border-radius:10px;padding:8px 12px;font-size:16px;color:var(--ink)}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
+.mini{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.mini button{min-height:36px;border:1px solid var(--line);background:var(--chip);border-radius:8px;padding:2px 10px;font-size:13px}
+.formula{margin-top:10px;font-size:13px;color:var(--muted);background:var(--soft);border-radius:8px;padding:8px 10px;overflow-wrap:anywhere}
+.ref{font-size:13px;width:100%;border-collapse:collapse;margin-top:10px}
+.ref td{border-top:1px solid var(--line);padding:6px 4px;vertical-align:top}
+.ref td:last-child{text-align:right;white-space:nowrap}
+.list .case{display:flex;align-items:center;gap:10px;padding:14px 0;border-top:1px solid var(--line)}
+.list .case:first-child{border-top:0}
+.case .who{flex:1}.case .who b{display:block;font-size:17px}.case .who span{font-size:13px;color:var(--muted)}
+.case .amt{font-weight:900;color:var(--gold);white-space:nowrap}
+.btn{min-height:46px;border-radius:12px;border:1.5px solid var(--line);background:var(--chip);padding:0 16px;font-weight:700;font-size:15px}
+.btn.pri{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.gold{background:var(--gold);color:var(--goldink);border-color:var(--gold)}
+.btn.del{color:var(--danger)}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.empty{text-align:center;color:var(--muted);padding:26px 8px}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--bg);z-index:9;padding:10px 16px calc(10px + env(safe-area-inset-bottom))}
+.bar .in{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.bar .lab{font-size:13px;opacity:.75}
+.bar .num{font-size:clamp(24px,7vw,32px);font-weight:900;color:var(--gold2);line-height:1.1;white-space:nowrap}
+.bar .grow{flex:1}
+.bar .btn{background:var(--gold);color:var(--goldink);border:0}
+/* calculation sheet: always light so exported image looks the same */
+.sheet{background:#fff;color:#1f1b14;border-radius:16px;border:1px solid #ece3cf;overflow:hidden}
+.sheet .top{background:linear-gradient(135deg,#d9a52a,#c8921a 55%,#a8760f);color:#2a1e04;padding:18px}
+.sheet .top b{display:block;font-size:20px;font-weight:900}
+.sheet .top span{font-size:13px}
+.sheet .meta{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:4px 12px;padding:14px 18px;font-size:13px;color:#6e6553;border-bottom:1px solid #ece3cf}
+.sheet .meta b{color:#1f1b14;font-weight:700}
+.sheet table{width:100%;border-collapse:collapse;font-size:14px}
+.sheet td{padding:10px 18px;border-bottom:1px solid #f1ead9;vertical-align:top}
+.sheet td:last-child{text-align:right;white-space:nowrap;font-weight:700}
+.sheet td small{display:block;color:#8a806b;font-size:12px;font-weight:400;overflow-wrap:anywhere}
+.sheet tr.sub td{background:#faf5e9;font-weight:700}
+.sheet tr.minus td:last-child{color:#b4442f}
+.sheet tr.total td{background:#1f1b14;color:#fff;font-size:17px;border:0}
+.sheet tr.total td:last-child{color:#e5b443;font-size:22px}
+.sheet .foot{padding:12px 18px 16px;font-size:12px;color:#8a806b;line-height:1.6}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal.on{display:flex}
+.modal .box{background:var(--card);color:var(--ink);border-radius:16px;padding:18px;max-width:520px;width:100%;max-height:88vh;overflow:auto}
+.modal img{width:100%;border-radius:10px;border:1px solid var(--line)}
+.modal textarea{width:100%;min-height:160px;font-size:12px;background:var(--soft);border:1px solid var(--line);border-radius:8px;padding:8px}
+.toast{position:fixed;left:50%;bottom:100px;transform:translateX(-50%);background:var(--gold);color:var(--goldink);padding:10px 18px;border-radius:999px;font-weight:700;font-size:14px;opacity:0;transition:opacity .25s;z-index:30;pointer-events:none}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){.toast{transition:none}}
+@media(max-width:420px){.tabs button{font-size:13px}.row2{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="hd">
+<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#fff6dd" stroke="#2a1e04" stroke-width="1.5"/><text x="20" y="27" text-anchor="middle" font-size="20" font-weight="900" fill="#a8760f" font-family="sans-serif">$</text><path d="M7 15 L28 7" stroke="#2a1e04" stroke-width="2.2" stroke-linecap="round"/><path d="M23 5.5 L29 6.6 L26.6 12" fill="none" stroke="#2a1e04" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<h1>車禍賠償試算<small>保險小管家｜志豪 &amp; 璟怡</small></h1>
+<button class="hbtn" id="homeBtn">全部個案</button>
+</div></header>
+<main id="app"></main>
+<div class="bar" id="bar" hidden><div class="in"><div class="grow"><div class="lab">預估可請求金額</div><div class="num" id="barNum">0</div></div><button class="btn" id="nextBtn">下一步</button></div></div>
+<div class="modal" id="modal"><div class="box" id="mbox"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+<script>
+{
+const KEY='crashcalc.v1';
+const ITEMS=[
+ {g:'醫療相關',k:'med',n:'醫療費',f:[['amt','醫療費用合計（依收據）','m']]},
+ {g:'醫療相關',k:'fmed',n:'後續醫療',f:[['amt','預估後續醫療費（依醫師評估）','m']]},
+ {g:'醫療相關',k:'trans',n:'交通費',f:[['amt','就醫交通費合計','m']]},
+ {g:'醫療相關',k:'meal',n:'住院期間膳食費',f:[['amt','膳食費合計','m']]},
+ {g:'醫療相關',k:'care',n:'看護費',f:[['fd','全日看護天數','n'],['fr','全日每日金額','m',[1200,2400,3000]],['hd','半日看護天數','n'],['hr','半日每日金額','m',[1200,2000]]]},
+ {g:'醫療相關',k:'supply',n:'醫療用品、輔具',f:[['amt','用品、輔具費用合計','m']]},
+ {g:'醫療相關',k:'pros',n:'義齒、義眼、義肢',f:[['amt','費用合計（含未來更換）','m']]},
+ {g:'收入與生活',k:'work',n:'休養不能工作',f:[['sal','月薪','m','minwage'],['mon','休養月數','n'],['day','另加天數','n']]},
+ {g:'收入與生活',k:'labor',n:'勞動能力減損',f:[['sal','月薪','m','minwage'],['pct','減損比例 %','n'],['start','起算日（通常為事故日或復工日）','d'],['ret','退休年齡','n']]},
+ {g:'收入與生活',k:'fcare',n:'未來看護（終身）',f:[['rate','每日看護金額','m',[1200,2400]],['yrs','剩餘年數（依內政部簡易生命表平均餘命）','n']]},
+ {g:'財物',k:'car',n:'車輛毀損',f:[['kind','車種','s'],['made','出廠年月','mo'],['parts','零件費','m'],['lab','工資','m'],['paint','烤漆費','m']]},
+ {g:'財物',k:'carval',n:'車價減少',f:[['amt','車價減損金額（依鑑定）','m']]},
+ {g:'財物',k:'appr',n:'車價鑑定費用',f:[['amt','鑑定費','m']]},
+ {g:'財物',k:'prop',n:'其他財物',f:[['amt','衣物、手機、安全帽等合計','m']]},
+ {g:'死亡事故',k:'fun',n:'喪葬費',f:[['amt','喪葬費合計','m']]},
+ {g:'精神',k:'mental',n:'精神慰撫金',f:[['amt','請求金額','m']]},
+ {g:'精神',k:'fmental',n:'家屬精神慰撫金',f:[['amt','請求金額（父母、子女、配偶合計）','m']]}
+];
+const IMAP=Object.fromEntries(ITEMS.map(i=>[i.k,i]));
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num=v=>{const x=parseFloat(String(v??'').replace(/,/g,''));return isFinite(x)?x:0};
+const fmt=n=>Math.round(n).toLocaleString('zh-TW');
+const today=()=>new Date().toISOString().slice(0,10);
+let db={cases:[]},cur=null,tab='info';
+try{const raw=localStorage.getItem(KEY);if(raw)db=JSON.parse(raw)}catch(e){}
+if(!Array.isArray(db.cases))db.cases=[];
+const save=()=>{if(cur)cur.upd=Date.now();try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('無法存檔，請記得匯出備份')}};
+const toast=t=>{const el=$('#toast');el.textContent=t;el.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('on'),2200)};
+
+/* ---------- 計算 ---------- */
+const minWage=d=>d&&d>='2027-01-01'?30900:d&&d>='2026-01-01'?29500:28590;
+function hoff(y){if(!(y>0))return 0;const n=Math.floor(y),f=y-n;let s=0;for(let k=0;k<n;k++)s+=1/(1+0.05*k);return s+f/(1+0.05*n)}
+const yrsBetween=(a,b)=>{const x=new Date(a),y=new Date(b);return isNaN(x)||isNaN(y)?0:(y-x)/(365.2425*864e5)};
+function monthsBetween(ym,d){if(!ym||!d)return 0;const [y,m]=ym.split('-').map(Number),[Y,M]=d.split('-').map(Number);return Math.max(0,(Y-y)*12+(M-m)+1)}
+function depParts(cost,kind,made,date){const r=kind==='moto'?0.536:0.369,mo=monthsBetween(made,date);if(!cost||!mo)return {v:cost,mo};const full=Math.floor(mo/12),rem=mo%12;let v=cost;for(let i=0;i<full;i++)v-=v*r;v-=v*r*rem/12;return {v:Math.max(v,cost/10),mo}}
+function calc(c,k){
+ const v=c.v[k]||{},i=IMAP[k];
+ switch(k){
+ case 'care':{const a=num(v.fd)*num(v.fr),b=num(v.hd)*num(v.hr);return {a:a+b,x:[a?`全日 ${fmt(num(v.fr))} × ${num(v.fd)} 天`:'',b?`半日 ${fmt(num(v.hr))} × ${num(v.hd)} 天`:''].filter(Boolean).join('＋')}}
+ case 'work':{const m=num(v.mon)+num(v.day)/30;return {a:num(v.sal)*m,x:`月薪 ${fmt(num(v.sal))} × ${+m.toFixed(2)} 個月`}}
+ case 'labor':{const st=v.start||c.date,age=c.birth&&st?yrsBetween(c.birth,st):0,y=Math.max(0,num(v.ret||65)-age),h=hoff(y),yr=num(v.sal)*12*num(v.pct)/100;
+  return {a:yr*h,x:c.birth?`年損失 ${fmt(yr)}（月薪 ${fmt(num(v.sal))} × 12 × ${num(v.pct)}%）× 霍夫曼係數 ${h.toFixed(4)}（${y.toFixed(2)} 年）`:'請先在「個案資料」填出生日期'}}
+ case 'fcare':{const y=num(v.yrs),h=hoff(y),yr=num(v.rate)*365;return {a:yr*h,x:`每日 ${fmt(num(v.rate))} × 365 天 × 霍夫曼係數 ${h.toFixed(4)}（${y} 年）`}}
+ case 'car':{const p=num(v.parts),d=depParts(p,v.kind||'car',v.made,c.date),a=d.v+num(v.lab)+num(v.paint);
+  return {a,x:`零件 ${fmt(p)} 折舊後 ${fmt(d.v)}（${v.kind==='moto'?'機車 3 年':'汽車 5 年'}，車齡 ${d.mo} 個月）＋工資 ${fmt(num(v.lab))}＋烤漆 ${fmt(num(v.paint))}`}}
+ default:return {a:num(v.amt),x:''}
+ }
+}
+function totals(c){
+ const rows=ITEMS.filter(i=>c.items[i.k]).map(i=>({i,...calc(c,i.k)}));
+ const sum=rows.reduce((s,r)=>s+r.a,0),fault=Math.min(100,num(c.fault)),after=sum*(1-fault/100),cmi=num(c.cmi);
+ return {rows,sum,fault,after,cmi,final:Math.max(0,after-cmi)};
+}
+const cmiLimit=d=>d&&d>='2026-07-01'?{death:300,all:320}:{death:200,all:220};
+
+/* ---------- 畫面 ---------- */
+function render(){
+ const app=$('#app');
+ if(!cur){$('#bar').hidden=true;app.innerHTML=listView();return}
+ $('#bar').hidden=false;
+ app.innerHTML=`<div class="tabs" role="tablist">${[['info','個案資料'],['pick','1 選項目'],['fill','2 填金額'],['sheet','3 計算表']].map(([k,n])=>`<button role="tab" data-tab="${k}" aria-selected="${tab===k}">${n}</button>`).join('')}</div>`+({info:infoView,pick:pickView,fill:fillView,sheet:sheetView}[tab])();
+ $('#nextBtn').textContent=tab==='sheet'?'回到填金額':'下一步';
+ updateNums();window.scrollTo(0,0);
+}
+function listView(){
+ const cs=[...db.cases].sort((a,b)=>(b.upd||0)-(a.upd||0));
+ return `<div class="card"><h2>全部個案</h2><p class="hint">資料只存在這支手機裡。換手機前請先「匯出備份」。</p>
+ <div class="list">${cs.length?cs.map(c=>`<div class="case"><div class="who"><b>${esc(c.name||'未命名個案')}</b><span>事故日 ${esc(c.date||'未填')}・${Object.values(c.items).filter(Boolean).length} 個項目</span></div><span class="amt">${fmt(totals(c).final)}</span><button class="btn" data-open="${esc(c.id)}">開啟</button></div>`).join(''):'<div class="empty">還沒有個案，按下面「新增個案」開始。</div>'}</div>
+ <div class="btns"><button class="btn gold" id="newCase">＋ 新增個案</button><button class="btn" id="exportBtn">匯出備份</button><button class="btn" id="importBtn">匯入備份</button></div></div>`;
+}
+function infoView(){
+ const c=cur,L=cmiLimit(c.date);
+ return `<div class="card"><h2>個案資料</h2>
+ <label class="f">當事人姓名<input data-c="name" value="${esc(c.name)}" placeholder="例如：王小明"></label>
+ <div class="row2"><label class="f">事故日期<input type="date" data-c="date" value="${esc(c.date)}"></label>
+ <label class="f">出生日期<input type="date" data-c="birth" value="${esc(c.birth)}"></label></div>
+ <div class="row2"><label class="f">我方肇責比例 %<input inputmode="decimal" data-c="fault" value="${esc(c.fault)}" placeholder="0"></label>
+ <label class="f">已領強制險金額<input inputmode="numeric" data-c="cmi" value="${esc(c.cmi)}" placeholder="0"></label></div>
+ <label class="f">備註<textarea data-c="note" rows="3" placeholder="傷勢、肇事經過、對方保險公司…">${esc(c.note)}</textarea></label>
+ <p class="formula">強制險上限（依事故日）：死亡、第一級失能 ${L.death} 萬元；傷害醫療 20 萬元；合計最高 ${L.all} 萬元。${c.date&&c.date<'2026-07-01'?'（2026/7/1 前的事故適用舊標準）':''}</p>
+ <div class="btns"><button class="btn del" id="delCase">刪除這個個案</button></div></div>`;
+}
+function pickView(){
+ let g='';
+ return `<div class="card"><h2>這個案子有哪些損害？</h2><p class="hint">把有的項目全部點選好，再按「下一步」填金額。</p>
+ ${ITEMS.map(i=>{const h=i.g!==g?(g&&'</div>')+`<div class="grp">${i.g}</div><div class="chips">`:'';g=i.g;return h+`<button class="chip" data-pick="${i.k}" aria-pressed="${!!cur.items[i.k]}">${cur.items[i.k]?'✓ ':''}${i.n}</button>`}).join('')}</div></div>`;
+}
+function field(k,[fk,lab,t,pre]){
+ const v=(cur.v[k]||{})[fk]??(fk==='ret'?65:fk==='kind'?'car':'');
+ const at=`data-i="${k}" data-k="${fk}"`;
+ let inp=t==='s'?`<select ${at}><option value="car"${v==='car'?' selected':''}>汽車（耐用 5 年）</option><option value="moto"${v==='moto'?' selected':''}>機車（耐用 3 年）</option></select>`
+  :t==='d'?`<input type="date" ${at} value="${esc(v)}">`:t==='mo'?`<input type="month" ${at} value="${esc(v)}">`
+  :`<input inputmode="${t==='n'?'decimal':'numeric'}" ${at} value="${esc(v)}" placeholder="0">`;
+ let mini='';
+ if(Array.isArray(pre))mini=`<div class="mini">${pre.map(p=>`<button data-set="${k}|${fk}|${p}">${fmt(p)}</button>`).join('')}</div>`;
+ if(pre==='minwage'){const w=minWage(cur.date);mini=`<div class="mini"><button data-set="${k}|${fk}|${w}">用最低工資 ${fmt(w)}</button></div>`}
+ return `<label class="f">${lab}${inp}</label>${mini}`;
+}
+function fillView(){
+ const ks=ITEMS.filter(i=>cur.items[i.k]);
+ if(!ks.length)return `<div class="card empty">還沒選項目，請先到「1 選項目」點選。</div>`;
+ return ks.map(i=>`<div class="card"><h3>${i.n}<b id="sub-${i.k}">0</b></h3>${i.f.map(f=>field(i.k,f)).join('')}<div class="formula" id="fx-${i.k}" ${['care','work','labor','fcare','car'].includes(i.k)?'':'hidden'}></div>${extra(i.k)}</div>`).join('');
+}
+function extra(k){
+ if(k==='mental')return `<table class="ref"><tr><td colspan="2"><b>2026 判決行情</b>（全台判決統計，非法定標準）</td></tr>
+ <tr><td>輕傷（擦挫傷等）中位數 35,000</td><td>20,000～70,000</td></tr><tr><td>骨折 中位數 160,000</td><td>100,000～300,000</td></tr>
+ <tr><td>失能、永久障礙 中位數 800,000</td><td>300,000～1,200,000</td></tr><tr><td>死亡 中位數 1,800,000</td><td>1,500,000～2,800,000</td></tr>
+ <tr><td>臺中市 51 件 中位數 150,000</td><td>36,000～250,000</td></tr>
+ <tr><td colspan="2"><b>臺中、彰化 2026 判決實例</b></td></tr>
+ <tr><td>沙鹿 115沙簡638（2026/11）手背、腿部多處挫擦傷，門診：請求 14 萬</td><td>30,000</td></tr>
+ <tr><td>豐原 115豐簡523（2026/11）恥骨、多根肋骨骨折：請求多少准多少</td><td>81,687</td></tr>
+ <tr><td>臺中 114中簡1108（2026/1）腳部開放性骨折、膝下截肢，本人</td><td>1,000,000</td></tr>
+ <tr><td>彰化 115彰簡369（2026/7）機車撞違停車死亡，父母各</td><td>1,500,000</td></tr>
+ <tr><td colspan="2">提醒：法院不會判超過請求金額，請求要開足。</td></tr></table>`;
+ if(k==='fmental')return `<p class="formula">被害人死亡時，父、母、子、女及配偶可各自請求（民法第 194 條）；重傷影響親子、配偶關係且情節重大時，也可請求（民法第 195 條第 3 項）。例如臺中 114中簡1108（2026/1）膝下截肢案，配偶判 25 萬、兒子分別判 30、10、10 萬；但也有截肢案法院認為家屬情節不夠重大而駁回（113中簡3306）。</p>`;
+ if(k==='care')return `<p class="formula">法院標準不一：有判決以強制險標準每日 1,200 元計算親屬看護，也有以全日 2,400、半日 2,000 元計算。親屬看護也可以請求。</p>`;
+ if(k==='car')return `<p class="formula">零件以定率遞減法折舊（汽車每年 0.369、機車每年 0.536），最低保留原價 1/10；工資、烤漆不扣折舊。車齡以出廠年月算到事故月份。</p>`;
+ if(k==='labor')return `<p class="formula">依霍夫曼計算法扣除中間利息（年息 5%，首期不扣除）。減損比例需醫院鑑定。</p>`;
+ return '';
+}
+function sheetView(){
+ const c=cur,t=totals(c);
+ return `<div class="sheet" id="sheet"><div class="top"><b>車禍賠償試算表</b><span>保險小管家｜志豪 &amp; 璟怡</span></div>
+ <div class="meta"><div>當事人 <b>${esc(c.name||'—')}</b></div><div>事故日 <b>${esc(c.date||'—')}</b></div><div>我方肇責 <b>${t.fault}%</b></div><div>製表日 <b>${today()}</b></div></div>
+ <table>${t.rows.map(r=>`<tr><td>${r.i.n}${r.x?`<small>${esc(r.x)}</small>`:''}</td><td>${fmt(r.a)}</td></tr>`).join('')||'<tr><td colspan="2">尚未選擇項目</td></tr>'}
+ <tr class="sub"><td>損害合計</td><td>${fmt(t.sum)}</td></tr>
+ ${t.fault?`<tr class="minus"><td>扣除我方肇責 ${t.fault}%<small>${fmt(t.sum)} × ${100-t.fault}% = ${fmt(t.after)}</small></td><td>−${fmt(t.sum-t.after)}</td></tr>`:''}
+ ${t.cmi?`<tr class="minus"><td>扣除已領強制險<small>強制汽車責任保險法第 32 條</small></td><td>−${fmt(t.cmi)}</td></tr>`:''}
+ <tr class="total"><td>預估可請求金額</td><td>${fmt(t.final)}</td></tr></table>
+ <div class="foot">本表為試算，僅供參考，實際金額以雙方調解或法院判決為準。精神慰撫金由法院依傷勢、雙方身分及經濟狀況酌定。<br>試算服務：保險小管家｜志豪 &amp; 璟怡</div></div>
+ <div class="btns"><button class="btn gold" id="pngBtn">存成圖片</button><button class="btn" id="pdfBtn">存成 PDF</button></div>`;
+}
+function updateNums(){
+ if(!cur)return;const t=totals(cur);$('#barNum').textContent=fmt(t.final);
+ t.rows.forEach(r=>{const s=document.getElementById('sub-'+r.i.k),x=document.getElementById('fx-'+r.i.k);if(s)s.textContent=fmt(r.a);if(x)x.textContent=r.x});
+}
+function modal(html){$('#mbox').innerHTML=html+`<div class="btns"><button class="btn pri" data-close>關閉</button></div>`;$('#modal').classList.add('on')}
+const closeModal=()=>$('#modal').classList.remove('on');
+
+/* ---------- 匯出 ---------- */
+let dl=null;
+if(window.claude&&window.claude.use)window.claude.use('downloads').then(d=>dl=d).catch(()=>{});
+const loadLib=(src,test)=>test()?Promise.resolve():new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=no;document.head.appendChild(s)});
+async function sheetCanvas(){
+ await loadLib('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',()=>window.html2canvas);
+ return window.html2canvas($('#sheet'),{scale:2,backgroundColor:'#ffffff'});
+}
+const fname=ext=>`車禍試算_${(cur.name||'個案').replace(/[\\/:*?"<>|]/g,'')}_${today()}.${ext}`;
+async function trySave(filename,data){if(!dl)return false;try{await dl.save({filename,data});toast('已存檔');return true}catch(e){if(e&&e.code==='declined')return true;return false}}
+async function exportPng(){
+ toast('產生圖片中…');
+ try{const cv=await sheetCanvas();const blob=await new Promise(r=>cv.toBlob(r,'image/png'));
+  if(!(await trySave(fname('png'),blob)))modal(`<h2>長按圖片儲存</h2><p class="hint">長按下面的圖片，選「儲存影像」或直接分享到 LINE。</p><img src="${cv.toDataURL('image/png')}" alt="車禍賠償試算表">`);
+ }catch(e){toast('產生失敗，請改用截圖')}
+}
+async function exportPdf(){
+ toast('產生 PDF 中…');
+ try{const cv=await sheetCanvas();
+  await loadLib('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>window.jspdf);
+  const pdf=new window.jspdf.jsPDF({unit:'pt',format:'a4'}),W=595-60,H=W*cv.height/cv.width,img=cv.toDataURL('image/jpeg',0.92);
+  let y=0;const PH=842-60;
+  while(y<H){if(y>0)pdf.addPage();pdf.addImage(img,'JPEG',30,30-y,W,H);y+=PH}
+  const blob=pdf.output('blob');
+  if(!(await trySave(fname('pdf'),blob)))modal(`<h2>無法在這裡存 PDF</h2><p class="hint">這個畫面不支援下載，請改用「存成圖片」。</p>`);
+ }catch(e){toast('產生失敗，請改用存成圖片')}
+}
+async function exportBackup(){
+ const txt=JSON.stringify(db);
+ if(!(await trySave(`車禍試算備份_${today()}.json`,txt)))modal(`<h2>備份內容</h2><p class="hint">這個畫面不支援下載，請全選下面文字，複製後存到備忘錄。</p><textarea readonly>${esc(txt)}</textarea>`);
+}
+
+/* ---------- 事件 ---------- */
+document.addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b)return;
+ if(b.id==='homeBtn'){cur=null;render();return}
+ if(b.id==='newCase'){cur={id:'c'+Date.now().toString(36),name:'',date:today(),birth:'',fault:'',cmi:'',note:'',items:{},v:{}};db.cases.push(cur);save();tab='info';render();return}
+ if(b.dataset.open){cur=db.cases.find(c=>c.id===b.dataset.open);tab='fill';if(!Object.values(cur.items).some(Boolean))tab='pick';render();return}
+ if(b.dataset.tab){tab=b.dataset.tab;render();return}
+ if(b.id==='nextBtn'){tab={info:'pick',pick:'fill',fill:'sheet',sheet:'fill'}[tab];render();return}
+ if(b.dataset.pick){const k=b.dataset.pick;cur.items[k]=!cur.items[k];b.setAttribute('aria-pressed',cur.items[k]);b.textContent=(cur.items[k]?'✓ ':'')+IMAP[k].n;save();updateNums();return}
+ if(b.dataset.set){const [k,fk,val]=b.dataset.set.split('|');(cur.v[k]=cur.v[k]||{})[fk]=val;const inp=document.querySelector(`[data-i="${k}"][data-k="${fk}"]`);if(inp)inp.value=val;save();updateNums();return}
+ if(b.id==='delCase'){modal(`<h2>確定刪除「${esc(cur.name||'未命名個案')}」？</h2><p class="hint">刪除後無法復原。</p><div class="btns"><button class="btn del" id="delYes">確定刪除</button></div>`);return}
+ if(b.id==='delYes'){db.cases=db.cases.filter(c=>c!==cur);cur=null;save();closeModal();render();toast('已刪除');return}
+ if(b.dataset.close!==undefined){closeModal();return}
+ if(b.id==='pngBtn')exportPng();
+ if(b.id==='pdfBtn')exportPdf();
+ if(b.id==='exportBtn')exportBackup();
+ if(b.id==='importBtn')$('#importFile').click();
+});
+$('#modal').addEventListener('click',e=>{if(e.target.id==='modal')closeModal()});
+document.addEventListener('input',e=>{
+ const t=e.target;if(!cur)return;
+ if(t.dataset.c){cur[t.dataset.c]=t.value;save();updateNums();return}
+ if(t.dataset.i){(cur.v[t.dataset.i]=cur.v[t.dataset.i]||{})[t.dataset.k]=t.value;save();updateNums()}
+});
+document.addEventListener('change',e=>{if(e.target.dataset&&e.target.dataset.c==='date'&&tab==='info')render()});
+$('#importFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{const d=JSON.parse(await f.text());if(!Array.isArray(d.cases))throw 0;let n=0;
+  d.cases.forEach(c=>{if(c&&c.id&&c.items&&c.v){const i=db.cases.findIndex(x=>x.id===c.id);if(i>=0)db.cases[i]=c;else db.cases.push(c);n++}});
+  save();render();toast(`已匯入 ${n} 個個案`);
+ }catch(err){toast('檔案格式不對，無法匯入')}
+ e.target.value='';
+});
+render();
+}
+</script>
+</body>
+</html>
